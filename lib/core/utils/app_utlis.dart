@@ -57,13 +57,18 @@ class AppUtlis {
     required BuildContext context,
     required ImageProvider template,
     required Size templateSize,
-    required List<Map<String, String>> rows,
+    required List<Map<String, String>> rows, // header -> value
     required List<TemplateField> fields,
     double pixelRatio = 3.0,
   }) async {
     final results = <Uint8List>[];
     final currentRow = ValueNotifier<Map<String, String>>(<String, String>{});
-    final hostKey = GlobalKey<CardCaptureHostState>(); // public State type [1]
+    final hostKey = GlobalKey<CardCaptureHostState>();
+
+    // Ensure template image is decoded/cached before first paint/capture
+    await precacheImage(template, context,
+        size: templateSize); // waits for image decoding [23]
+    await WidgetsBinding.instance.endOfFrame; // let first frame render [24]
 
     final entry = OverlayEntry(
       builder: (_) => Offstage(
@@ -84,15 +89,41 @@ class AppUtlis {
     );
 
     Overlay.of(context, rootOverlay: true)
-        .insert(entry); // ensure mounted in a real overlay [7]
-    await WidgetsBinding.instance.endOfFrame; // wait for mount [7]
+        .insert(entry); // mount in a real overlay [16]
+    await WidgetsBinding
+        .instance.endOfFrame; // wait for mount & first paint [24]
 
     try {
       for (final row in rows) {
-        currentRow.value = row; // triggers rebuild [11]
-        await WidgetsBinding.instance.endOfFrame; // wait for paint [21]
+        // Enrich: store values under id and header variants for robust lookups
+        final enriched = <String, String>{...row};
+
+        // Normalize incoming row keys for case/space-insensitive matching
+        final normalized = <String, String>{};
+        for (final e in row.entries) {
+          final lower = e.key.trim().toLowerCase();
+          final val = e.value.trim();
+          normalized[lower] = val;
+          normalized[lower.replaceAll(RegExp(r'\s+'), '')] = val;
+        }
+
+        // Fill values for each field under multiple keys
+        for (final f in fields) {
+          final hOrig = f.excelColumn.trim();
+          final hLower = hOrig.toLowerCase();
+          final hNoSpace = hLower.replaceAll(RegExp(r'\s+'), '');
+          final v = normalized[hLower] ?? normalized[hNoSpace] ?? '';
+
+          enriched[f.id] = v; // by field id [21]
+          enriched[hOrig] = v; // by original header (exact) [21]
+          enriched[hLower] = v; // by lowercase header [21]
+          enriched[hNoSpace] = v; // by no-space header [21]
+        }
+
+        currentRow.value = enriched; // trigger rebuild [21]
+        await WidgetsBinding.instance.endOfFrame; // ensure text painted [24]
         final bytes = await hostKey.currentState!
-            .capture(pixelRatio: pixelRatio); // now non-null [21]
+            .capture(pixelRatio: pixelRatio); // capture after paint [22]
         results.add(bytes);
       }
     } finally {

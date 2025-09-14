@@ -26,7 +26,7 @@ class SingleCardWidget extends StatelessWidget {
 
     return SizedBox(
       width: templateSize.width,
-      height: templateSize.height,
+      height: templateSize.height / 2,
       child: Stack(
         children: [
           Positioned.fill(
@@ -37,7 +37,7 @@ class SingleCardWidget extends StatelessWidget {
           for (final f in fields)
             Positioned(
               left: f.x * templateSize.width,
-              top: f.y * templateSize.height,
+              top: f.y * templateSize.height * 3.19,
               width: (f.width * templateSize.width).clamp(1, double.infinity),
               height:
                   (f.height * templateSize.height).clamp(1, double.infinity),
@@ -58,8 +58,8 @@ class SingleCardWidget extends StatelessWidget {
             value,
             textAlign: f.align ?? TextAlign.left,
             style: TextStyle(
-              fontSize: f.fontSize ?? 16,
-              color: Color(f.color ?? 0xFF000000),
+              fontSize: f.fontSize ?? 13,
+              color: const Color(0xFF000000),
               fontFamily: f.fontFamily,
             ),
           ),
