@@ -1,32 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:id_card_generator_app/domain/models/field_type.dart';
 import 'package:id_card_generator_app/domain/models/template_field_model.dart';
 
 class SingleCardWidget extends StatelessWidget {
   final ImageProvider template;
   final Size templateSize;
-  final Map<String, String> row;
+  final Map<String, String> valuesByFieldId;
   final List<TemplateField> fields;
 
-  const SingleCardWidget(
-      {super.key,
-      required this.template,
-      required this.templateSize,
-      required this.row,
-      required this.fields});
+  const SingleCardWidget({
+    super.key,
+    required this.template,
+    required this.templateSize,
+    required this.valuesByFieldId,
+    required this.fields,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Build a case-insensitive map
-    final normalized = <String, String>{
-      for (final e in row.entries) e.key.trim().toLowerCase(): e.value
-    };
-    String valueOf(String header) =>
-        normalized[header.trim().toLowerCase()] ?? '';
-
     return SizedBox(
       width: templateSize.width,
-      height: templateSize.height / 2,
+      height: templateSize.height,
       child: Stack(
         children: [
           Positioned.fill(
@@ -34,42 +27,36 @@ class SingleCardWidget extends StatelessWidget {
                   image: template,
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.high)),
-          for (final f in fields)
-            Positioned(
-              left: f.x * templateSize.width,
-              top: f.y * templateSize.height * 3.19,
-              width: (f.width * templateSize.width).clamp(1, double.infinity),
-              height:
-                  (f.height * templateSize.height).clamp(1, double.infinity),
-              child: _buildField(f, valueOf(f.excelColumn)),
-            ),
+          Positioned(
+            top: templateSize.width * 0.226,
+            left: templateSize.width * 0.14,
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              for (final f in fields)
+                Positioned(
+                  left: f.x * templateSize.width,
+                  top: f.y * templateSize.height,
+                  width: f.width * templateSize.width,
+                  height: f.height * templateSize.height,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      valuesByFieldId[f.id] ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: f.align ?? TextAlign.left,
+                      style: TextStyle(
+                        fontSize: (14).toDouble(),
+                        color: const Color(0xFF000000),
+                        fontFamily: f.fontFamily,
+                      ),
+                    ),
+                  ),
+                ),
+            ]),
+          )
         ],
       ),
     );
-  }
-
-  Widget _buildField(TemplateField f, String value) {
-    switch (f.type) {
-      case FieldType.text:
-        return FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Text(
-            value,
-            textAlign: f.align ?? TextAlign.left,
-            style: TextStyle(
-              fontSize: f.fontSize ?? 13,
-              color: const Color(0xFF000000),
-              fontFamily: f.fontFamily,
-            ),
-          ),
-        );
-      case FieldType.photo:
-        return value.isEmpty
-            ? DecoratedBox(decoration: BoxDecoration(border: Border.all()))
-            : Image.network(value, fit: BoxFit.cover);
-      case FieldType.qr:
-        return const SizedBox.shrink();
-    }
   }
 }

@@ -1,4 +1,3 @@
-// lib/presentation/components/card_capture_host.dart
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -13,13 +12,13 @@ class CardCaptureHost extends StatefulWidget {
     required this.template,
     required this.templateSize,
     required this.fields,
-    required this.rowListenable,
+    required this.valuesListenable,
   });
 
   final ImageProvider template;
   final Size templateSize;
   final List<TemplateField> fields;
-  final ValueListenable<Map<String, String>> rowListenable;
+  final ValueListenable<Map<String, String>> valuesListenable;
 
   @override
   CardCaptureHostState createState() => CardCaptureHostState();
@@ -29,11 +28,10 @@ class CardCaptureHostState extends State<CardCaptureHost> {
   final _repaintKey = GlobalKey();
 
   Future<Uint8List> capture({double pixelRatio = 3.0}) async {
-    await WidgetsBinding.instance.endOfFrame; // ensure painted [21]
+    await WidgetsBinding.instance.endOfFrame;
     final boundary =
         _repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    final image =
-        await boundary.toImage(pixelRatio: pixelRatio); // high DPI [21]
+    final image = await boundary.toImage(pixelRatio: pixelRatio);
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     return data!.buffer.asUint8List();
   }
@@ -43,15 +41,15 @@ class CardCaptureHostState extends State<CardCaptureHost> {
     return RepaintBoundary(
       key: _repaintKey,
       child: ValueListenableBuilder<Map<String, String>>(
-        valueListenable: widget.rowListenable,
-        builder: (context, row, _) {
+        valueListenable: widget.valuesListenable,
+        builder: (context, valuesByFieldId, _) {
           return SizedBox(
             width: widget.templateSize.width,
             height: widget.templateSize.height,
             child: SingleCardWidget(
               template: widget.template,
               templateSize: widget.templateSize,
-              row: row,
+              valuesByFieldId: valuesByFieldId,
               fields: widget.fields,
             ),
           );

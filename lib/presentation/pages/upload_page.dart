@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:id_card_generator_app/core/theme/app_color.dart';
+import 'package:id_card_generator_app/presentation/components/custom_filled_button.dart';
 
 import '../providers/excel_provider.dart';
 import '../providers/template_provider.dart';
@@ -49,21 +50,6 @@ class UploadStep extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Row(children: [
-          //   ElevatedButton(
-          //       onPressed: () => _pickTemplate(ref),
-          //       child: const Text('Upload Template')),
-          //   const SizedBox(width: 12),
-          //   ElevatedButton(
-          //       onPressed: () => _pickExcel(ref),
-          //       child: const Text('Upload Excel')),
-          // ]),
-          // const SizedBox(height: 16),
-          // Text(
-          //     'Template: ${template.hasValue && template.value != null ? "Loaded" : "Not loaded"}'),
-          // Text(
-          //     'Excel: ${excel.hasValue && excel.value != null ? "Loaded" : "Not loaded"}'),
-
           Stack(
             children: [
               InkWell(
@@ -161,8 +147,11 @@ class UploadStep extends ConsumerWidget {
             ],
           ),
           const Spacer(),
-          ElevatedButton(
-              onPressed: ready ? onNext : null, child: const Text('Next')),
+          CustomFilledButton(
+            size: Size(MediaQuery.of(context).size.width, 50),
+            onTap: ready ? onNext : null,
+            title: 'Next',
+          )
         ],
       ),
     );

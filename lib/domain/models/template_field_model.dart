@@ -10,11 +10,11 @@ class TemplateField with _$TemplateField {
   const factory TemplateField({
     required String id,
     required FieldType type,
-    required String excelColumn, // e.g., "Name", "ID", "PhotoURL"
-    required double x, // normalized 0..1
-    required double y, // normalized 0..1
-    required double width, // normalized 0..1
-    required double height, // normalized 0..1
+    required String excelColumn,
+    required double x,
+    required double y,
+    required double width,
+    required double height,
     String? fontFamily,
     double? fontSize,
     int? color, // ARGB

@@ -25,6 +25,16 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
           backgroundColor: AppColor.primary,
           centerTitle: true,
+          leading: index == 0
+              ? null
+              : IconButton(
+                  onPressed: () => setState(() => index = index - 1),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    size: 16,
+                    color: AppColor.white,
+                  ),
+                ),
           title: const Text(
             'ID Card Generator',
             style: TextStyle(fontSize: 16, color: AppColor.white),

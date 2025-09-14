@@ -19,8 +19,7 @@ class PdfBytesNotifier extends AsyncNotifier<Uint8List?> {
   Future<void> generate(List<Uint8List> cardPngs) async {
     state = const AsyncLoading();
     final usecase = ref.read(buildPdfUseCaseProvider);
-    state = await AsyncValue.guard(
-        () => usecase.call(cardPngs)); // uses pdf under the hood [3]
+    state = await AsyncValue.guard(() => usecase.call(cardPngs));
   }
 
   void clear() => state = const AsyncData(null);

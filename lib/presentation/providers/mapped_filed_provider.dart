@@ -5,7 +5,11 @@ class MappedFieldsNotifier extends Notifier<List<TemplateField>> {
   @override
   List<TemplateField> build() => <TemplateField>[];
 
-  void setAll(List<TemplateField> fields) => state = fields;
+  void setAll(List<TemplateField> fields) {
+    print(fields);
+    state = fields;
+  }
+
   void update(String id, TemplateField f) => state = [
         for (final x in state)
           if (x.id == id) f else x

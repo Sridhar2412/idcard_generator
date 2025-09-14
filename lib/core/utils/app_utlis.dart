@@ -30,7 +30,6 @@ class AppUtlis {
     double spacing = 8,
   }) async {
     final doc = pw.Document();
-    // final images = cardPngs.map((b) => pw.MemoryImage(b)).toList();
 
     for (final bytes in cardPngs) {
       final img = pw.MemoryImage(bytes);
@@ -65,11 +64,9 @@ class AppUtlis {
     final currentRow = ValueNotifier<Map<String, String>>(<String, String>{});
     final hostKey = GlobalKey<CardCaptureHostState>();
 
-    // Ensure template image is decoded/cached before first paint/capture
-    await precacheImage(template, context,
-        size: templateSize); // waits for image decoding [23]
-    await WidgetsBinding.instance.endOfFrame; // let first frame render [24]
-
+    await precacheImage(template, context, size: templateSize);
+    await WidgetsBinding.instance.endOfFrame;
+    print(fields);
     final entry = OverlayEntry(
       builder: (_) => Offstage(
         offstage: false,
@@ -81,24 +78,20 @@ class AppUtlis {
               template: template,
               templateSize: templateSize,
               fields: fields,
-              rowListenable: currentRow,
+              valuesListenable: currentRow,
             ),
           ),
         ),
       ),
     );
 
-    Overlay.of(context, rootOverlay: true)
-        .insert(entry); // mount in a real overlay [16]
-    await WidgetsBinding
-        .instance.endOfFrame; // wait for mount & first paint [24]
+    Overlay.of(context, rootOverlay: true).insert(entry);
+    await WidgetsBinding.instance.endOfFrame;
 
     try {
       for (final row in rows) {
-        // Enrich: store values under id and header variants for robust lookups
         final enriched = <String, String>{...row};
 
-        // Normalize incoming row keys for case/space-insensitive matching
         final normalized = <String, String>{};
         for (final e in row.entries) {
           final lower = e.key.trim().toLowerCase();
@@ -107,23 +100,22 @@ class AppUtlis {
           normalized[lower.replaceAll(RegExp(r'\s+'), '')] = val;
         }
 
-        // Fill values for each field under multiple keys
         for (final f in fields) {
           final hOrig = f.excelColumn.trim();
           final hLower = hOrig.toLowerCase();
           final hNoSpace = hLower.replaceAll(RegExp(r'\s+'), '');
           final v = normalized[hLower] ?? normalized[hNoSpace] ?? '';
 
-          enriched[f.id] = v; // by field id [21]
-          enriched[hOrig] = v; // by original header (exact) [21]
-          enriched[hLower] = v; // by lowercase header [21]
-          enriched[hNoSpace] = v; // by no-space header [21]
+          enriched[f.id] = v;
+          enriched[hOrig] = v;
+          enriched[hLower] = v;
+          enriched[hNoSpace] = v;
         }
 
-        currentRow.value = enriched; // trigger rebuild [21]
-        await WidgetsBinding.instance.endOfFrame; // ensure text painted [24]
-        final bytes = await hostKey.currentState!
-            .capture(pixelRatio: pixelRatio); // capture after paint [22]
+        currentRow.value = enriched;
+        await WidgetsBinding.instance.endOfFrame;
+        final bytes =
+            await hostKey.currentState!.capture(pixelRatio: pixelRatio);
         results.add(bytes);
       }
     } finally {

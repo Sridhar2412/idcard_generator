@@ -22,12 +22,11 @@ TemplateField _$TemplateFieldFromJson(Map<String, dynamic> json) {
 mixin _$TemplateField {
   String get id => throw _privateConstructorUsedError;
   FieldType get type => throw _privateConstructorUsedError;
-  String get excelColumn =>
-      throw _privateConstructorUsedError; // e.g., "Name", "ID", "PhotoURL"
-  double get x => throw _privateConstructorUsedError; // normalized 0..1
-  double get y => throw _privateConstructorUsedError; // normalized 0..1
-  double get width => throw _privateConstructorUsedError; // normalized 0..1
-  double get height => throw _privateConstructorUsedError; // normalized 0..1
+  String get excelColumn => throw _privateConstructorUsedError;
+  double get x => throw _privateConstructorUsedError;
+  double get y => throw _privateConstructorUsedError;
+  double get width => throw _privateConstructorUsedError;
+  double get height => throw _privateConstructorUsedError;
   String? get fontFamily => throw _privateConstructorUsedError;
   double? get fontSize => throw _privateConstructorUsedError;
   int? get color => throw _privateConstructorUsedError; // ARGB
@@ -260,19 +259,14 @@ class _$TemplateFieldImpl implements _TemplateField {
   final FieldType type;
   @override
   final String excelColumn;
-// e.g., "Name", "ID", "PhotoURL"
   @override
   final double x;
-// normalized 0..1
   @override
   final double y;
-// normalized 0..1
   @override
   final double width;
-// normalized 0..1
   @override
   final double height;
-// normalized 0..1
   @override
   final String? fontFamily;
   @override
@@ -352,15 +346,15 @@ abstract class _TemplateField implements TemplateField {
   @override
   FieldType get type;
   @override
-  String get excelColumn; // e.g., "Name", "ID", "PhotoURL"
+  String get excelColumn;
   @override
-  double get x; // normalized 0..1
+  double get x;
   @override
-  double get y; // normalized 0..1
+  double get y;
   @override
-  double get width; // normalized 0..1
+  double get width;
   @override
-  double get height; // normalized 0..1
+  double get height;
   @override
   String? get fontFamily;
   @override

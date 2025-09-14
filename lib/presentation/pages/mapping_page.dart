@@ -3,11 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:id_card_generator_app/core/theme/app_color.dart';
 import 'package:id_card_generator_app/domain/models/field_type.dart';
 import 'package:id_card_generator_app/domain/models/template_field_model.dart';
+import 'package:id_card_generator_app/presentation/components/custom_filled_button.dart';
 import 'package:id_card_generator_app/presentation/components/template_canvas_widget.dart';
 import 'package:id_card_generator_app/presentation/providers/mapped_filed_provider.dart';
 
 import '../providers/excel_provider.dart';
 import '../providers/template_provider.dart';
+
+final fieldTypeProvider = StateProvider<FieldType>((ref) {
+  return FieldType.text;
+});
 
 class MappingStep extends ConsumerStatefulWidget {
   const MappingStep({super.key, required this.onNext, required this.onBack});
@@ -54,16 +59,19 @@ class _MappingStepState extends ConsumerState<MappingStep> {
       children: [
         Row(
           children: [
-            // const SizedBox(width: 16),
-            // DropdownButton<FieldType>(
-            //   value: FieldType.text,
-            //   items: const [
-            //     DropdownMenuItem(value: FieldType.text, child: Text('Text')),
-            //     DropdownMenuItem(value: FieldType.photo, child: Text('Photo')),
-            //   ],
-            //   onChanged: (_) {},
-            // ),
-            // const SizedBox(width: 12),
+            const SizedBox(width: 16),
+            DropdownButton<FieldType>(
+              value: ref.watch(fieldTypeProvider),
+              items: const [
+                DropdownMenuItem(value: FieldType.text, child: Text('Text')),
+                DropdownMenuItem(value: FieldType.photo, child: Text('Photo')),
+              ],
+              onChanged: (val) {
+                ref.read(fieldTypeProvider.notifier).state =
+                    val ?? FieldType.text;
+              },
+            ),
+            const SizedBox(width: 12),
             const Spacer(),
             DropdownButton<String>(
               hint: const Text('Select Excel column'),
@@ -72,16 +80,10 @@ class _MappingStepState extends ConsumerState<MappingStep> {
                   DropdownMenuItem(value: c, child: Text(c))
               ],
               onChanged: (col) {
-                if (col != null) _addField(FieldType.text, col);
+                if (col != null) _addField(ref.watch(fieldTypeProvider), col);
               },
             ),
             const Spacer(),
-            // IconButton(
-            //     onPressed: widget.onBack, icon: const Icon(Icons.arrow_back)),
-            // const SizedBox(width: 8),
-            // ElevatedButton(
-            //     onPressed: () => widget.onNext(), child: const Text('Next')),
-            // const SizedBox(width: 16),
           ],
         ),
         const Divider(),
@@ -101,24 +103,25 @@ class _MappingStepState extends ConsumerState<MappingStep> {
                   height: rect.height / h,
                 );
               });
+              print('Field moved: $fields');
             },
           ),
         ),
         const Spacer(),
-        Row(
-          children: [
-            ElevatedButton(onPressed: widget.onBack, child: const Text('Back')),
-            const Spacer(),
-            ElevatedButton(
-                onPressed: () {
-                  // after setState updates
-                  ref
-                      .read(mappedFieldsProvider.notifier)
-                      .setAll(List<TemplateField>.from(fields));
-                  widget.onNext();
-                },
-                child: const Text('Next')),
-          ],
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: Expanded(
+            child: CustomFilledButton(
+              size: Size(MediaQuery.of(context).size.width, 50),
+              onTap: () {
+                ref
+                    .read(mappedFieldsProvider.notifier)
+                    .setAll(List<TemplateField>.from(fields));
+                widget.onNext();
+              },
+              title: 'Next',
+            ),
+          ),
         ),
       ],
     );
