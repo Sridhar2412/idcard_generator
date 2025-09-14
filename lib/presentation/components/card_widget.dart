@@ -39,16 +39,18 @@ class SingleCardWidget extends StatelessWidget {
                   width: f.width * templateSize.width,
                   height: f.height * templateSize.height,
                   child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      valuesByFieldId[f.id] ?? '',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: f.align ?? TextAlign.left,
-                      style: TextStyle(
-                        fontSize: (14).toDouble(),
-                        color: const Color(0xFF000000),
-                        fontFamily: f.fontFamily,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: Text(
+                        valuesByFieldId[f.id] ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: f.align ?? TextAlign.left,
+                        style: TextStyle(
+                          fontSize: (14).toDouble(),
+                          color: const Color(0xFF000000),
+                          fontFamily: f.fontFamily,
+                        ),
                       ),
                     ),
                   ),
